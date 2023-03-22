@@ -2,38 +2,20 @@ logging:
   level:
     root: INFO
 server:
-  port: 8080
-spring:
-  security:
-    oauth2:
-      client: # Refs: https://docs.spring.io/spring-security/reference/servlet/oauth2/login/core.html#oauth2login-boot-property-mappings
-        provider:
-          azure-active-directory:
-            authorization-uri: https://login.microsoftonline.com/common/oauth2/v2.0/authorize # Refs: https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols
-            jwk-set-uri: https://login.microsoftonline.com/common/discovery/v2.0/keys
-            token-uri: https://login.microsoftonline.com/common/oauth2/v2.0/token
-            user-name-attribute: name
-        registration:
-          github:
-            provider: github
-            authorization-grant-type: authorization_code
-            client-id: 5e24ecb660e62c41eeea
-            client-secret: 14aeef5184f5efdef46b008144c7a46a7de09f29
-            scope: repo # Refs: https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28#create-or-update-a-repository-secret
-            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
-          graph:
-            provider: azure-active-directory
-            authorization-grant-type: authorization_code
-            client-id: ${graph-client-id}
-            client-secret: ${graph-client-secret}
-            scope:
-              - https://graph.microsoft.com/User.ReadBasic.All
-              - https://graph.microsoft.com/Application.ReadWrite.All
-            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
-          management:
-            provider: azure-active-directory
-            authorization-grant-type: authorization_code
-            client-id: ${management-client-id}
-            client-secret: ${management-client-secret}
-            scope: https://management.azure.com/user_impersonation # Refs: https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
-            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
+  port: 8888
+
+spring.boot.admin:
+  probed-endpoints: health,env,metrics,httptrace:trace,httptrace,threaddump:dump,threaddump,jolokia,info,refresh,flyway,liquibase,heapdump,loggers,auditevents,mappings,scheduledtasks,configprops,caches,beans
+  ui:
+    cache.no-cache: true
+    extension-resource-locations: "file:../azure-spring-apps-launcher/target/dist/"
+    cache-templates: false
+    title: Azure Spring Apps Launcher
+
+logging.level:
+  root: info
+  de.codecentric: debug
+
+asa:
+  subscription-id: ${subscription-id}
+  instance-name: ${instance-name}

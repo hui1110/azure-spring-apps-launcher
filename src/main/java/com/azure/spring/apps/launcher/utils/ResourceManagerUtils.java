@@ -1,4 +1,4 @@
-package org.jimmy.test.util;
+package com.azure.spring.apps.launcher.utils;
 
 import com.azure.core.credential.AccessToken;
 import com.azure.core.credential.TokenCredential;

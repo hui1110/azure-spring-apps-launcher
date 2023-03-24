@@ -23,7 +23,11 @@
           <div class="card-body">
             <h5 class="card-title">Spring Cloud Gateway</h5>
             <p class="card-text">Spring Cloud Gateway is an API Gateway / Backend For the FrontEnd (BFF) framework. It is based on Spring 5, Spring Boot 2, and Project Reactor / Webflux and works on a non-blocking API model.</p>
-            <a href="#" class="btn btn-primary">Deploy</a>
+            <a href="deploy/spring-cloud-gateway" class="btn btn-primary" @click="showapi1" v-if="show1">Deploy</a>
+            <button class="btn btn-primary" v-if="!show1" disabled>
+              <span class="spinner-border spinner-border-sm"></span>
+              Loading...
+            </button>
           </div>
         </div>
       </div>
@@ -74,7 +78,15 @@ export default {
       applications,
     };
   },
+  data() {
+    return {
+      show1: true,
+    }
+  },
   methods: {
+    showapi1() {
+      this.show1 = !this.show1;
+    },
     stringify: JSON.stringify,
   },
 };

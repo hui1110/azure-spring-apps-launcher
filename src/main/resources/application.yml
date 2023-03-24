@@ -17,5 +17,7 @@ logging.level:
   de.codecentric: debug
 
 asa:
-  subscription-id: ${subscription-id}
-  instance-name: ${instance-name}
+#  subscription-id: 8c81302b-c67a-494e-ac1b-17e93b7e2e5a
+  subscription-id: 799c12ba-353c-44a1-883d-84808ebb2216
+  resource-group: rg-666
+  instance-name: asa-test1

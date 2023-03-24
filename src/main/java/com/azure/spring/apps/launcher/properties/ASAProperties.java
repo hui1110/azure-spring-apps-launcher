@@ -9,7 +9,7 @@ public class ASAProperties {
 
     private String subscriptionId;
     private String resourceGroup;
-    private String springCloudInstanceName;
+    private String instanceName;
 
     public String getSubscriptionId() {
         return subscriptionId;
@@ -27,11 +27,11 @@ public class ASAProperties {
         this.resourceGroup = resourceGroup;
     }
 
-    public String getSpringCloudInstanceName() {
-        return springCloudInstanceName;
+    public String getInstanceName() {
+        return instanceName;
     }
 
-    public void setSpringCloudInstanceName(String springCloudInstanceName) {
-        this.springCloudInstanceName = springCloudInstanceName;
+    public void setInstanceName(String instanceName) {
+        this.instanceName = instanceName;
     }
 }

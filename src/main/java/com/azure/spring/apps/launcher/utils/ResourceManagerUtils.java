@@ -25,7 +25,20 @@ public class ResourceManagerUtils {
             .configure()
             .withLogLevel(HttpLogDetailLevel.BASIC)
             .authenticate(credential, profile)
-            .withSubscription("8c81302b-c67a-494e-ac1b-17e93b7e2e5a");
+            .withDefaultSubscription();
+//            .withSubscription("8c81302b-c67a-494e-ac1b-17e93b7e2e5a");
+    }
+
+//    public static AzureResourceManager getResourceManager(TokenCredential token, String subscription) {
+    public static AzureResourceManager getResourceManager(String token, String subscription) {
+        final AzureProfile profile = new AzureProfile(AzureEnvironment.AZURE);
+        final TokenCredential credential = toTokenCredential(token);
+        return AzureResourceManager
+            .configure()
+            .withLogLevel(HttpLogDetailLevel.BASIC)
+//            .authenticate(token, profile)
+            .authenticate(credential, profile)
+            .withSubscription(subscription);
     }
 
     private static TokenCredential toTokenCredential(String accessToken) {

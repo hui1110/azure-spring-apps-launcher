@@ -30,9 +30,27 @@
       <artifactId>spring-boot-starter-logging</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-oauth2-client</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-webflux</artifactId> <!-- Require this because this project used WebClient. -->
+    </dependency>
+    <dependency>
+      <groupId>org.apache.tuweni</groupId>
+      <artifactId>tuweni-crypto</artifactId>
+      <version>2.3.1</version>
+    </dependency>
+    <dependency>
       <groupId>com.azure.resourcemanager</groupId>
       <artifactId>azure-resourcemanager</artifactId>
       <version>2.21.0</version>
+    </dependency>
+    <dependency>
+      <groupId>com.azure.resourcemanager</groupId>
+      <artifactId>azure-resourcemanager-subscription</artifactId>
+      <version>1.0.0-beta.2</version>
     </dependency>
     <dependency>
       <groupId>com.azure</groupId>

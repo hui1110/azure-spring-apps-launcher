@@ -16,8 +16,46 @@ logging.level:
   root: info
   de.codecentric: debug
 
-asa:
-#  subscription-id: 8c81302b-c67a-494e-ac1b-17e93b7e2e5a
-  subscription-id: 799c12ba-353c-44a1-883d-84808ebb2216
-  resource-group: rg-666
-  instance-name: asa-test1
+spring:
+  security:
+    oauth2:
+      client: # Refs: https://docs.spring.io/spring-security/reference/servlet/oauth2/login/core.html#oauth2login-boot-property-mappings
+        provider:
+          azure-active-directory:
+            authorization-uri: https://login.microsoftonline.com/common/oauth2/v2.0/authorize # Refs: https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-v2-protocols
+            jwk-set-uri: https://login.microsoftonline.com/common/discovery/v2.0/keys
+            token-uri: https://login.microsoftonline.com/common/oauth2/v2.0/token
+            user-name-attribute: name
+            user-info-uri: https://graph.microsoft.com/oidc/userinfo
+        registration:
+#          github:
+#            provider: github
+#            authorization-grant-type: authorization_code
+#            client-id: ${github-client-id}
+#            client-secret: ${github-client-secret}
+#            scope: repo # Refs: https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28#create-or-update-a-repository-secret
+#            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
+#          graph:
+#            provider: azure-active-directory
+#            authorization-grant-type: authorization_code
+#            client-id: ${aad-client-id}
+#            client-secret: ${aad-client-secret}
+#            scope:
+#              - https://graph.microsoft.com/User.ReadBasic.All
+#              - https://graph.microsoft.com/Application.ReadWrite.All
+#            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
+          management:
+            provider: azure-active-directory
+            authorization-grant-type: authorization_code
+            client-id: {}
+            client-secret: {}
+            scope:
+              - https://management.azure.com/user_impersonation # Refs: https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
+              - openid
+              - profile
+              - offline_access
+            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
+
+
+
+

@@ -58,11 +58,6 @@
       <version>1.7.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.tuweni</groupId>
-      <artifactId>tuweni-crypto</artifactId>
-      <version>2.3.1</version>
-    </dependency>
-    <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-test</artifactId>
       <scope>test</scope>
@@ -78,6 +73,18 @@
       <artifactId>spring-boot-admin-starter-client</artifactId>
       <version>3.0.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>org.eclipse.jgit</groupId>
+      <artifactId>org.eclipse.jgit</artifactId>
+      <version>6.0.0.202111291000-r</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-compress</artifactId>
+      <version>1.21</version>
+    </dependency>
+
   </dependencies>
 
   <build>

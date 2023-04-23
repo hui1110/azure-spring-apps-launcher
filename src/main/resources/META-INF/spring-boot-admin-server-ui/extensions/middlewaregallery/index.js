@@ -17,6 +17,7 @@
 /* global SBA */
 import middlewaregallery from './middlewaregallery.vue';
 import handle from './handle.vue';
+import deploy from './deploy.vue';
 
 
 // tag::customization-ui-toplevel[]
@@ -29,6 +30,16 @@ SBA.use({
             handle, //<4>
             order: 1000, //<5>
         });
+        viewRegistry.addView(
+            {
+                name: "deploy", //<1>
+                path: "/deploy", //<2>
+                component: deploy, //<3>
+                label: "deploy", //<4>
+                order: 1000, //<5>
+                props: {"gitRepoUrl": new URLSearchParams(location.search).get("url")},
+            }
+        );
         i18n.mergeLocaleMessage("en", {
             custom: {
                 label: "Middleware Gallery", //<6>

@@ -1,6 +1,11 @@
 package com.azure.spring.apps.launcher.model;
 
+import com.azure.core.management.Region;
+
 public class ASAInstance {
+
+    private Region region;
+    private String resourceGroupName;
 
     private String id;
 
@@ -11,7 +16,9 @@ public class ASAInstance {
     public ASAInstance() {
     }
 
-    public ASAInstance(String id, String name, String sku) {
+    public ASAInstance(Region region,String resourceGroupName, String id, String name, String sku) {
+        this.region = region;
+        this.resourceGroupName = resourceGroupName;
         this.id = id;
         this.name = name;
         this.sku = sku;
@@ -40,4 +47,21 @@ public class ASAInstance {
     public void setSku(String sku) {
         this.sku = sku;
     }
+
+    public String getResourceGroupName() {
+        return resourceGroupName;
+    }
+
+    public void setResourceGroupName(String resourceGroupName) {
+        this.resourceGroupName = resourceGroupName;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
 }

@@ -1,23 +1,24 @@
 package com.azure.spring.apps.launcher.controller;
 
-import com.azure.core.credential.TokenCredential;
-import com.azure.resourcemanager.AzureResourceManager;
-import com.azure.resourcemanager.appplatform.models.SpringService;
-import com.azure.resourcemanager.resources.fluentcore.arm.ResourceId;
+import com.azure.core.management.Region;
+import com.azure.resourcemanager.appplatform.models.RuntimeVersion;
 import com.azure.spring.apps.launcher.model.ASAInstance;
+import com.azure.spring.apps.launcher.model.AppInstance;
+import com.azure.spring.apps.launcher.model.RegionInstance;
+import com.azure.spring.apps.launcher.model.ResourceGrooupInstance;
 import com.azure.spring.apps.launcher.model.Subscription;
 import com.azure.spring.apps.launcher.service.IndexService;
-import com.azure.spring.apps.launcher.utils.ResourceManagerUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import org.eclipse.jgit.api.Git;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.annotation.RegisteredOAuth2AuthorizedClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 public class IndexController {
@@ -61,6 +62,56 @@ public class IndexController {
     @GetMapping("/queryProcess/{rgName}/{asaName}/{subscriptionId}")
     public int queryProgress(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @PathVariable String subscriptionId, @PathVariable String rgName, @PathVariable String asaName) {
         return indexService.queryProgress(management, rgName, asaName, subscriptionId);
+    }
+
+
+    @GetMapping("/getRepo")
+    public boolean deployGithubRepoToASA(HttpServletRequest request, @RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management) {
+
+        String url = request.getParameter("url");
+        String subscriptionId = request.getParameter("subscriptionId");
+        String rgName = request.getParameter("rgName");
+        String serviceName = request.getParameter("serviceName");
+        String appName = request.getParameter("appName");
+        String javaVersion = request.getParameter("javaVersion");
+        String regionName = request.getParameter("region");
+        String enableAction = request.getParameter("enableAction");
+
+        Region region = Region.fromName(regionName);
+        RuntimeVersion runtimeVersion = indexService.getJavaVersion(javaVersion);
+
+        Git git = null;
+        try {
+            git = Git.cloneRepository()
+                     .setURI(url)
+                     .call();
+            String pathName = git.getRepository().getWorkTree().toString();
+            indexService.deploySourceCodeToSpringApps(management,subscriptionId, region, rgName, serviceName, appName, runtimeVersion, pathName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (git != null) {
+                git.getRepository().close();
+                git.close();
+                indexService.deleteRepositoryDirectory(git.getRepository().getWorkTree());
+            }
+        }
+        return true;
+    }
+
+    @GetMapping("/getAppList")
+    public List<AppInstance> getAppListFromASAInstance(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management,@RequestParam String subscriptionId, @RequestParam String rgName, @RequestParam String serviceName){
+       return indexService.appList(management, rgName, serviceName, subscriptionId);
+    }
+
+    @GetMapping("/getRegionList")
+    public List<RegionInstance> getRegionList() {
+        return indexService.RegionList();
+    }
+
+    @GetMapping("/getResourceGroups/{subscriptionId}")
+    public List<ResourceGrooupInstance> getResourceGroups(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management,@PathVariable String subscriptionId) {
+        return indexService.ResourceGroup(management,subscriptionId);
     }
 
 }

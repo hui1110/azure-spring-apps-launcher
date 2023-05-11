@@ -9,6 +9,7 @@ spring.boot.admin:
   ui:
     cache.no-cache: true
     extension-resource-locations: "file:../azure-spring-apps-launcher/target/dist/"
+#    extension-resource-locations: "file:../BOOT-INF/dist/"
     cache-templates: false
     title: Azure Spring Apps Launcher
 
@@ -35,27 +36,27 @@ spring:
 #            client-secret: ${github-client-secret}
 #            scope: repo # Refs: https://docs.github.com/en/rest/actions/secrets?apiVersion=2022-11-28#create-or-update-a-repository-secret
 #            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
-#          graph:
-#            provider: azure-active-directory
-#            authorization-grant-type: authorization_code
-#            client-id: ${aad-client-id}
-#            client-secret: ${aad-client-secret}
-#            scope:
-#              - https://graph.microsoft.com/User.ReadBasic.All
-#              - https://graph.microsoft.com/Application.ReadWrite.All
-#            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
+          graph:
+            provider: azure-active-directory
+            authorization-grant-type: authorization_code
+            client-id: fdb1b856-fe8b-420e-8079-fc0cd1ad7ea5
+            client-secret: Urg8Q~T0QuW524CFycE9XUcxMwRSbznWOBP8xaAj
+            scope:
+              - https://graph.microsoft.com/User.ReadBasic.All
+              - https://graph.microsoft.com/Application.ReadWrite.All
+            redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
           management:
             provider: azure-active-directory
             authorization-grant-type: authorization_code
-            client-id: {}
-            client-secret: {}
+            client-id: fdb1b856-fe8b-420e-8079-fc0cd1ad7ea5
+            client-secret: Urg8Q~T0QuW524CFycE9XUcxMwRSbznWOBP8xaAj
             scope:
               - https://management.azure.com/user_impersonation # Refs: https://docs.microsoft.com/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
               - openid
               - profile
               - offline_access
             redirect-uri: "{baseScheme}://{baseHost}{basePort}{basePath}/login/oauth2/code/"
-
+#            redirect-uri: "https://yonghui-deploy-dev-azure.azuremicroservices.io/login/oauth2/code/"
 
 
 

@@ -65,8 +65,8 @@ public class IndexController {
     }
 
 
-    @GetMapping("/getRepo")
-    public boolean deployGithubRepoToASA(HttpServletRequest request, @RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management) {
+    @GetMapping("/deployApp")
+    public String deployGithubRepoToASA(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, HttpServletRequest request) {
 
         String url = request.getParameter("url");
         String subscriptionId = request.getParameter("subscriptionId");
@@ -76,6 +76,7 @@ public class IndexController {
         String javaVersion = request.getParameter("javaVersion");
         String regionName = request.getParameter("region");
         String enableAction = request.getParameter("enableAction");
+        String branchName = request.getParameter("branchName");
 
         Region region = Region.fromName(regionName);
         RuntimeVersion runtimeVersion = indexService.getJavaVersion(javaVersion);
@@ -84,6 +85,7 @@ public class IndexController {
         try {
             git = Git.cloneRepository()
                      .setURI(url)
+                     .setBranch(branchName)
                      .call();
             String pathName = git.getRepository().getWorkTree().toString();
             indexService.deploySourceCodeToSpringApps(management,subscriptionId, region, rgName, serviceName, appName, runtimeVersion, pathName);
@@ -96,22 +98,37 @@ public class IndexController {
                 indexService.deleteRepositoryDirectory(git.getRepository().getWorkTree());
             }
         }
-        return true;
+        return "done";
     }
 
     @GetMapping("/getAppList")
-    public List<AppInstance> getAppListFromASAInstance(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management,@RequestParam String subscriptionId, @RequestParam String rgName, @RequestParam String serviceName){
-       return indexService.appList(management, rgName, serviceName, subscriptionId);
+    public List<AppInstance> getAppListFromASAInstance(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @RequestParam String subscriptionId, @RequestParam String rgName, @RequestParam String serviceName){
+        return indexService.appList(management, rgName, serviceName, subscriptionId);
     }
 
     @GetMapping("/getRegionList")
-    public List<RegionInstance> getRegionList() {
+    public List<RegionInstance> getRegionList(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management) {
         return indexService.RegionList();
     }
 
     @GetMapping("/getResourceGroups/{subscriptionId}")
-    public List<ResourceGrooupInstance> getResourceGroups(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management,@PathVariable String subscriptionId) {
+    public List<ResourceGrooupInstance> getResourceGroups(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @PathVariable String subscriptionId) {
         return indexService.ResourceGroup(management,subscriptionId);
+    }
+
+    @GetMapping("/queryRgProgress")
+    public boolean queryRgProgress(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @RequestParam String subscriptionId, @RequestParam String rgName){
+        return indexService.queryRgProgress(management, rgName, subscriptionId);
+    }
+
+    @GetMapping("/queryASAProgress")
+    public boolean queryASAProgress(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @RequestParam String subscriptionId, @RequestParam String rgName, @RequestParam String serviceName){
+        return indexService.queryASAProgress(management, subscriptionId, rgName, serviceName);
+    }
+
+    @GetMapping("/queryAppProgress")
+    public boolean queryAppProgress(@RegisteredOAuth2AuthorizedClient("management") OAuth2AuthorizedClient management, @RequestParam String subscriptionId, @RequestParam String rgName, @RequestParam String serviceName, @RequestParam String appName){
+        return indexService.queryAppProgress(management, subscriptionId, rgName, serviceName, appName);
     }
 
 }

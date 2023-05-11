@@ -88,6 +88,12 @@
   </dependencies>
 
   <build>
+<!--    <resources>-->
+<!--      <resource>-->
+<!--        <directory>target/dist/</directory>-->
+<!--        <targetPath>BOOT-INF/dist/</targetPath>-->
+<!--      </resource>-->
+<!--    </resources>-->
     <plugins>
       <plugin>
         <groupId>org.springframework.boot</groupId>

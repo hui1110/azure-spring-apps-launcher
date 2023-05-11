@@ -35,9 +35,12 @@ SBA.use({
                 name: "deploy", //<1>
                 path: "/deploy", //<2>
                 component: deploy, //<3>
-                label: "deploy", //<4>
+                label: "Deploy", //<4>
                 order: 1000, //<5>
-                props: {"gitRepoUrl": new URLSearchParams(location.search).get("url")},
+                props: {
+                    "gitRepoUrl": new URLSearchParams(location.search).get("url"),
+                    "branchName": new URLSearchParams(location.search).get("branch"),
+                },
             }
         );
         i18n.mergeLocaleMessage("en", {

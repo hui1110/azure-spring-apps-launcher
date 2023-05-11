@@ -6,6 +6,7 @@ import com.azure.resourcemanager.appplatform.models.RuntimeVersion;
 import com.azure.resourcemanager.appplatform.models.SpringApp;
 import com.azure.resourcemanager.appplatform.models.SpringApps;
 import com.azure.resourcemanager.appplatform.models.SpringService;
+import com.azure.resourcemanager.resources.models.ResourceGroup;
 import com.azure.spring.apps.launcher.model.ASAInstance;
 import com.azure.spring.apps.launcher.model.AppInstance;
 import com.azure.spring.apps.launcher.model.RegionInstance;
@@ -27,7 +28,9 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 
@@ -107,7 +110,7 @@ public class IndexService {
 
     private void deploySpringApp(String flag, AzureResourceManager azureResourceManager, String rgName, String serviceName, String appName, RuntimeVersion jdkVersion,
                                  File JarFile) {
-        System.out.printf("Creating spring cloud app %s in Azure Spring App %s ...%n", appName, serviceName);
+//        System.out.printf("Creating spring cloud app %s in Azure Spring App %s ...%n", appName, serviceName);
 
         SpringService service = azureResourceManager.springServices().getByResourceGroup(rgName, serviceName);
         if ("jar".equals(flag)) {
@@ -133,7 +136,7 @@ public class IndexService {
             ResourceManagerUtils.print(app);
 
         }
-        System.out.printf("Created spring cloud app %s %n", appName);
+//        System.out.printf("Created spring cloud app %s %n", appName);
     }
 
     public int queryProgress(OAuth2AuthorizedClient management, String rgName, String serviceName, String subscriptionId){
@@ -154,14 +157,15 @@ public class IndexService {
 
     public List<Subscription> subscriptionList(OAuth2AuthorizedClient management) {
         AzureResourceManager arm = ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue());
-        return arm.subscriptions().list().stream()
+        return arm.subscriptions().list().stream().sorted(Comparator.comparing(com.azure.resourcemanager.resources.models.Subscription::displayName))
                   .map(subscription -> new Subscription(subscription.subscriptionId(), subscription.displayName()))
                   .collect(Collectors.toList());
     }
 
     public List<ASAInstance> instanceList(OAuth2AuthorizedClient management, String subscriptionId) {
         AzureResourceManager arm = ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
-        return arm.springServices().list().stream()
+        List<ResourceGrooupInstance> resourceGrooupInstances = ResourceGroup(management,subscriptionId);
+        return arm.springServices().list().stream().filter(springService -> resourceGrooupInstances.stream().anyMatch(resourceGrooupInstance -> Objects.equals(springService.resourceGroupName(), resourceGrooupInstance.getName()))).sorted(Comparator.comparing(com.azure.resourcemanager.appplatform.models.SpringService::name))
                   .map(springService -> new ASAInstance(springService.region(), springService.resourceGroupName(), springService.id(), springService.name(), springService.sku().tier()))
                   .collect(Collectors.toList());
     }
@@ -188,8 +192,8 @@ public class IndexService {
 
         try {
             if (azureResourceManager.springServices().checkNameAvailability(serviceName, region).nameAvailable()) {
-                createASA(azureResourceManager, rgName, serviceName, region);
-                System.out.println("Created Azure Spring Apps: " + serviceName);
+                String serviceId = createASA(azureResourceManager, rgName, serviceName, region);
+                System.out.println("Created Azure Spring Apps: " + serviceName + "Id: " + serviceId);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -260,9 +264,9 @@ public class IndexService {
                                      String subscriptionId) {
         AzureResourceManager azureResourceManager =
             ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
-        SpringApps spps = azureResourceManager.springServices().getByResourceGroup(rgName, serviceName).apps();
-        return spps.list().stream()
-                   .map(springApp -> new AppInstance(springApp.id(), springApp.name()))
+        SpringApps apps = azureResourceManager.springServices().getByResourceGroup(rgName, serviceName).apps();
+        return apps.list().stream().sorted(Comparator.comparing(SpringApp::name))
+                   .map(springApp -> new AppInstance(springApp.id(), springApp.name(), springApp.getActiveDeployment() == null ? "---" : String.valueOf(springApp.getActiveDeployment().runtimeVersion()),springApp.getActiveDeployment() == null ? 0: springApp.getActiveDeployment().cpu(), springApp.getActiveDeployment() == null ? 0: springApp.getActiveDeployment().memoryInGB(), springApp.getActiveDeployment() == null || springApp.getActiveDeployment().instances() == null ? 0: springApp.getActiveDeployment().instances().size()))
                    .toList();
     }
 
@@ -274,15 +278,52 @@ public class IndexService {
                 resList.add(new RegionInstance(region.name(), region.label()));
             }
         }
-        return resList;
+        return resList.stream().sorted(Comparator.comparing(RegionInstance::getName)).collect(Collectors.toList());
     }
 
     public List<ResourceGrooupInstance> ResourceGroup(OAuth2AuthorizedClient management, String subscriptionId) {
         AzureResourceManager azureResourceManager =
             ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
-        return azureResourceManager.resourceGroups().list().stream()
+        return azureResourceManager.resourceGroups().list().stream().sorted(Comparator.comparing(ResourceGroup::name))
                                    .map(resourceGroup -> new ResourceGrooupInstance(resourceGroup.name()))
                                    .collect(Collectors.toList());
+    }
+
+    public boolean queryRgProgress(OAuth2AuthorizedClient management, String rgName, String subscriptionId){
+        try {
+            AzureResourceManager azureResourceManager =
+                ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
+            azureResourceManager.resourceGroups().getByName(rgName);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean queryASAProgress(OAuth2AuthorizedClient management, String subscriptionId, String rgName, String serviceName){
+        try {
+            AzureResourceManager azureResourceManager =
+                ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
+            azureResourceManager.springServices().getByResourceGroup(rgName, serviceName);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean queryAppProgress(OAuth2AuthorizedClient management, String subscriptionId, String rgName, String serviceName, String appName){
+        try {
+            AzureResourceManager azureResourceManager =
+                ResourceManagerUtils.getResourceManager(management.getAccessToken().getTokenValue(), subscriptionId);
+            SpringService service = azureResourceManager.springServices().getByResourceGroup(rgName, serviceName);
+            service.apps().getByName(appName);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

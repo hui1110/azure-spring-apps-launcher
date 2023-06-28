@@ -13,9 +13,9 @@
   <groupId>com.azure.spring</groupId>
   <artifactId>azure-spring-apps-launcher</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>azure-spring-apps-launcher</name>
 
   <properties>
+    <java.version>17</java.version>
     <node.version>v16.13.2</node.version>
     <npm.version>8.3.2</npm.version>
   </properties>

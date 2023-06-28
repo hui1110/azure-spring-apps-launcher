@@ -13,6 +13,7 @@
   <groupId>com.azure.spring</groupId>
   <artifactId>azure-spring-apps-launcher</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <name>azure-spring-apps-launcher</name>
 
   <properties>
     <java.version>17</java.version>

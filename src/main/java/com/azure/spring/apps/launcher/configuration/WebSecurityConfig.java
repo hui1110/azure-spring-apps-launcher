@@ -15,15 +15,28 @@ public class WebSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        http.authorizeHttpRequests()
+//        http.authorizeHttpRequests()
 //            .anyRequest().permitAll();
 //        http.authorizeHttpRequests().requestMatchers(
 //                        "/", "/assets/**", "/sba-settings.js",
 //                        "/extensions/**", "/variables.css", "/applications/**",
 //                        "/instances/**", "/deploy/**", "/login/**", "/github/**"
 //                    ).permitAll()
-            .anyRequest().authenticated()
-                         .and().oauth2Login();
+//            .anyRequest().authenticated()
+//                         .and().oauth2Login();
+
+
+        http.authorizeHttpRequests()
+            .requestMatchers("/deploy/**")
+            .authenticated()
+            .and()
+            .oauth2Login()
+            .loginPage("/oauth2/authorization/management");
+//                        .loginProcessingUrl("/oauth2/authorization/management")
+
+        http.authorizeHttpRequests()
+                    .anyRequest().permitAll();
+
         return http.build();
     }
 
